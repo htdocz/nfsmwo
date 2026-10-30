@@ -1,4 +1,5 @@
 # NFS Most Wanted - Save & Junkman Tool
+
 <img width="1436" height="1030" alt="image" src="https://github.com/user-attachments/assets/5a99d56b-77c0-4602-93b8-e19508e9c93c" />
 
 [English](#english) | [Türkçe](#türkçe)
@@ -14,7 +15,9 @@ This tool allows you to easily load high-tier save files, cash, and exclusive **
 ⚠️ **Prerequisite:** You must already have the base game installed on your PC before using this tool.
 
 ### 📥 How to Get a License Key
-To activate and use the tool, you need a valid license code. You can purchase your license instantly via Sopsy:
+To activate and use the tool, you need a valid license code. The price is **250 TRY (approx. $5 USD)**. 
+> ⚠️ **Important:** Please make sure to enter your **correct email address** during checkout, as your license code will be delivered directly to your inbox.
+
 👉 **[Purchase License Key Here](https://www.sopsy.com/d/4Qimc9)**
 
 ### 🚀 Installation & Usage Guide
@@ -35,7 +38,9 @@ Bu araç, **Need for Speed: Most Wanted** oyununa kolayca yüksek bütçeli kay�
 ⚠️ **Ön Koşul:** Bu aracı kullanabilmeniz için bilgisayarınızda oyunun halihazırda kurulu olması gerekmektedir.
 
 ### 📥 Lisans Kodu Nasıl Satın Alınır?
-Aracı etkinleştirmek ve kullanabilmek için bir lisans koduna ihtiyacınız vardır. Sopsy üzerinden anında lisans kodu satın alabilirsiniz:
+Aracı etkinleştirmek ve kullanabilmek için bir lisans koduna ihtiyacınız var. Fiyat sadece **250 TL (yaklaşık 5 Dolar)**!
+> ⚠️ **Önemli Uyarı:** Lütfen satın alım sırasında **e-posta adresinizi doğru yazdığınızdan emin olun**, çünkü lisans kodunuz mail adresinize gönderilecektir.
+
 👉 **[Buradan Lisans Kodu Satın Alın](https://www.sopsy.com/d/4Qimc9)**
 
 ### 🚀 Kurulum ve Kullanım Rehberi
