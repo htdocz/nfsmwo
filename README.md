@@ -1,22 +1,44 @@
-# NFS Most Wanted (2005) Web (`web.nfsmwo.com`) — RACERS (21 Araç + $999,999,999) Paket Yükleyici
 
-Tarayıcı tabanlı **Need for Speed: Most Wanted (2005)** (`web.nfsmwo.com` / PlakMP) için geliştirilmiş tek tıkla doğrudan OPFS (Origin Private File System) profil ve garaj yükleme aracı.
+<img width="1436" height="1030" alt="image" src="https://github.com/user-attachments/assets/5a99d56b-77c0-4602-93b8-e19508e9c93c" />
 
-## Paket İçeriği
-- **Profil:** `RACERS`
-- **Nakit Para:** `$999,999,999`
-- **Kariyer Garajı (21 Adet Full Junkman `0x7F` Performanslı Araç + 52 Uyumlu Preset):**
-  - BMW M3 GTR, Chevrolet Corvette C6, Dodge Viper SRT10, Mazda RX-8, Toyota Supra, Mercedes-Benz SLR McLaren, Lamborghini Gallardo, Aston Martin DB9, Porsche Cayman S, Mitsubishi Lancer EVOLUTION VIII, Ford Mustang GT, BMW M5, Nissan Skyline GT-R R34 vb.
-- **Desteklenen Tarayıcılar:** Opera GX, Opera, Google Chrome, Microsoft Edge, Brave, Vivaldi.
+[English](#english) | [Türkçe](#türkçe)
 
-## Kullanım
-1. `NFSMW_Save_Bot.exe` dosyasını çalıştırın.
-2. **"RACERS (21 ARAÇ + $999,999,999) PAKETİNİ DOĞRUDAN YÜKLE"** butonuna tıklayın.
-3. Tarayıcınızdaki oyun sekmesinde **F5** tuşuna basarak sayfayı yenileyin ve `RACERS` profiline girin.
+---
 
-## Kaynak Koddan Derleme (Windows .NET Framework 4.0+)
-Ek bir programa ihtiyaç duymadan `Derle_Build.bat` dosyasına çift tıklayarak veya aşağıdaki komutla doğrudan derleyebilirsiniz:
+<a name="english"></a>
+## 🇬🇧 English
 
-```bat
-C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /target:winexe /optimize+ /platform:anycpu /win32icon:app.ico /out:NFSMW_Save_Bot.exe /r:System.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll NFSMW_Save_Bot.cs
-```
+### 📌 Overview
+Welcome to the official repository of **nfsmwo.com**! This tool allows you to easily load high-tier save files, unlimited cash, and exclusive **Junkman parts** into **Need for Speed: Most Wanted**. 
+
+⚠️ **Prerequisite:** You must already have the base game installed on your web before using this tool.
+
+### 🚀 Installation & Usage Guide
+1. Make sure **Need for Speed: Most Wanted** is installed on your computer.
+2. Download the tool's `.exe` file from the releases.
+3. Right-click on the `.exe` file and select **"Run as administrator"**.
+5. Restart your game, log into your profile, and enjoy your new save/parts!
+
+---
+
+<a name="türkçe"></a>
+## 🇹🇷 Türkçe
+
+### 📌 Genel Bakış
+**nfsmwo.com** resmi deposuna hoş geldiniz! Bu araç, **Need for Speed: Most Wanted** oyununa kolayca yüksek bütçeli kayıt dosyası (save), sınırsız para ve özel **Junkman parçaları** yüklemenizi sağlar.
+
+⚠️ **Ön Koşul:** Bu aracı kullanabilmeniz için bilgisayarınızda oyunun halihazırda web'de kurulu olması gerekmektedir.
+
+### 🚀 Kurulum ve Kullanım Rehberi
+1. Bilgisayarınızda **Need for Speed: Most Wanted** oyununun kurulu olduğundan emin olun.
+2. Sürümler (Releases) kısmından `.exe` dosyasını indirin.
+3. İndirdiğiniz `.exe` dosyasına sağ tıklayın ve **"Yönetici olarak çalıştır"** seçeneğini seçin.
+5. Oyunu yeniden başlatın, profilinize giriş yapın ve oyunun tadını çıkarın!
+
+---
+
+### 🔍 Tags & SEO Keywords
+`nfsmwo`, `nfsmwo.com`, `nfs most wanted save editor`, `nfs most wanted junkman hack`, `nfsmw money cheat tool`, `nfs most wanted trainer pc`, `need for speed most wanted porsche carrera gt save`, `nfs most wanted para hilesi`, `nfs most wanted junkman açma`, `nfs most wanted save dosyası`, `nfs most wanted hile programı`, `nfs most wanted para ve araba yükleme`.
+
+### #️⃣ Hashtags
+#NFSMW #NeedForSpeed #MostWanted #nfsmwo #Gaming #Cheat #SaveEditor #PCGames #Junkman #Gamer #NFS #ParaHilesi
