@@ -27,6 +27,10 @@ To activate and use the tool, you need a valid license code. The price is **250 
 4. Enter your purchased license code when prompted.
 5. Restart your game, log into your profile, and enjoy your new save/parts!
 
+
+### 🛡️ Antivirus Warning Notice (False Positive)
+Some antivirus programs (including Windows Defender) may flag the `.exe` file as a Trojan or risk. **This is a 100% false positive!** 
+Because this tool interacts with game save files and requires validation checks, security software can occasionally misidentify it. If your antivirus blocks the file, simply add a quick exclusion or disable real-time protection temporarily while running it. Rest assured, our tool is completely safe and clean.
 ---
 
 <a name="türkçe"></a>
@@ -50,6 +54,10 @@ Aracı etkinleştirmek ve kullanabilmek için bir lisans koduna ihtiyacınız va
 4. Satın aldığınız lisans kodunu ekrana girin.
 5. Oyunu yeniden başlatın, profilinize giriş yapın ve oyunun tadını çıkarın!
 
+
+### 🛡️ Antivirüs Uyarısı Hakkında (Yanlış Alarm / False Positive)
+Windows Defender veya bazı antivirüs programları, .exe dosyası sistemde lisans doğrulaması yaptığı ve oyun kayıt dosyalarıyla (`save`) etkileşime girdiğinden dosyayı yanlışlıkla "Trojan" veya zararlı yazılım olarak görebilir. **Bu tamamen yanlış bir alarmdır (False-Positive)!**
+Programımız tamamen güvenlidir. Antivirüs programınız dosyayı engellerse, hızlıca dışlananlar (exclusions) listesine ekleyebilir veya aracı çalıştırırken korumayı geçici olarak devre dışı bırakabilirsiniz. İçiniz rahat olsun, tamamen temizdir.
 ---
 ### 🔍 Tags & SEO Keywords
 `nfsmwo`, `nfsmwo.com`, `nfs most wanted save editor`, `nfs most wanted junkman hack`, `nfsmw money cheat tool`, `nfs most wanted trainer pc`, `need for speed most wanted porsche carrera gt save`, `nfs most wanted para hilesi`, `nfs most wanted junkman açma`, `nfs most wanted save dosyası`, `nfs most wanted hile programı`, `nfs most wanted para ve araba yükleme`.
