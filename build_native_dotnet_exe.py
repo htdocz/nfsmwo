@@ -743,23 +743,23 @@ namespace NFSMWCareerUtility
 
             string multStr = speedMultiplier.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
             string jsScript =
-                "(function() {" +
+                "(function() {{" +
                 " const mult = " + multStr + ";" +
-                " if (window._nfsmwSpeedHackActive) { alert('Hiz Asirtma zaten aktif! Yeni carpan: ' + mult + 'x'); window._nfsmwMult = mult; return; }" +
+                " if (window._nfsmwSpeedHackActive) {{ alert('Hiz Asirtma zaten aktif! Yeni carpan: ' + mult + 'x'); window._nfsmwMult = mult; return; }}" +
                 " window._nfsmwSpeedHackActive = true;" +
                 " window._nfsmwMult = mult;" +
                 " const origNow = performance.now.bind(performance);" +
                 " let start = origNow();" +
                 " let fake = start;" +
-                " performance.now = function() {" +
+                " performance.now = function() {{" +
                 "   const now = origNow();" +
                 "   fake += (now - start) * (window._nfsmwMult || 1.0);" +
                 "   start = now;" +
                 "   return fake;" +
-                " };" +
+                " }};" +
                 " console.log('%c[NFSMW ROKET MOTORU AKTIF]: ' + mult + 'x Carpan Hazir!', 'color:#22c55e; font-size:14px; font-weight:bold;');" +
                 " alert('ROKET HIZ ASIRTMA AKTIFLESTIRILDI! Carpan: ' + mult + 'x. Gaza bastiginizda araba roket gibi firlayacak!');" +
-                "})();";
+                "}})();";
 
             try
             {{
