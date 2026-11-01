@@ -742,25 +742,24 @@ namespace NFSMWCareerUtility
             else if (levelIdx == 3) speedMultiplier = 4.8;
 
             string multStr = speedMultiplier.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
-            StringBuilder sbJs = new StringBuilder();
-            sbJs.AppendLine("(function() {{");
-            sbJs.AppendLine("  const mult = " + multStr + ";");
-            sbJs.AppendLine("  if (window._nfsmwSpeedHackActive) {{ alert('Hız Aşırtma Motoru zaten aktif! Çarpan güncellendi: ' + mult + 'x'); window._nfsmwMult = mult; return; }}");
-            sbJs.AppendLine("  window._nfsmwSpeedHackActive = true;");
-            sbJs.AppendLine("  window._nfsmwMult = mult;");
-            sbJs.AppendLine("  const origNow = performance.now.bind(performance);");
-            sbJs.AppendLine("  let start = origNow();");
-            sbJs.AppendLine("  let fake = start;");
-            sbJs.AppendLine("  performance.now = function() {{");
-            sbJs.AppendLine("    const now = origNow();");
-            sbJs.AppendLine("    fake += (now - start) * (window._nfsmwMult || 1.0);");
-            sbJs.AppendLine("    start = now;");
-            sbJs.AppendLine("    return fake;");
-            sbJs.AppendLine("  }};");
-            sbJs.AppendLine("  console.log('%c[NFSMW ROKET MOTORU AKTİF]: 0-400 km/s Roket İvmesi Hazır! (' + mult + 'x)', 'color:#22c55e; font-size:14px; font-weight:bold;');");
-            sbJs.AppendLine("  alert('ROKET HIZ ASIRTMA MOTORU AKTIFLESTIRILDI!\\n\\nSecili Arac: " + selectedCar + "\\nHiz Carpani: ' + mult + 'x\\n\\nArtik gaza bastiginizda araba 400 km/s hiza saniyeler icinde ulasacak!');");
-            sbJs.AppendLine("}})();");
-            string jsScript = sbJs.ToString();
+            string jsScript =
+                "(function() {" +
+                " const mult = " + multStr + ";" +
+                " if (window._nfsmwSpeedHackActive) { alert('Hiz Asirtma zaten aktif! Yeni carpan: ' + mult + 'x'); window._nfsmwMult = mult; return; }" +
+                " window._nfsmwSpeedHackActive = true;" +
+                " window._nfsmwMult = mult;" +
+                " const origNow = performance.now.bind(performance);" +
+                " let start = origNow();" +
+                " let fake = start;" +
+                " performance.now = function() {" +
+                "   const now = origNow();" +
+                "   fake += (now - start) * (window._nfsmwMult || 1.0);" +
+                "   start = now;" +
+                "   return fake;" +
+                " };" +
+                " console.log('%c[NFSMW ROKET MOTORU AKTIF]: ' + mult + 'x Carpan Hazir!', 'color:#22c55e; font-size:14px; font-weight:bold;');" +
+                " alert('ROKET HIZ ASIRTMA AKTIFLESTIRILDI! Carpan: ' + mult + 'x. Gaza bastiginizda araba roket gibi firlayacak!');" +
+                "})();";
 
             try
             {{
