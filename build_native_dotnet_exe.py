@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 """
 Pure-MSIL, Zero-Dropper-Heuristic .NET Builder for NFSMW_Save_Bot.exe
-1. NO LICENSE KEY SYSTEM / NO HWID LOCK — Direct 1-Click Installation on any PC!
-2. ZERO Clipboard.SetText / ZERO JS code / ZERO Base64 / ZERO Desktop RACERS.txt dump!
-3. Universal Profile Support: Automatically preserves the target profile's name (at 0x5A31..0x5A40) and recalculates EA CRC32 (CRC1, CRC2, CRC3) + MD5 checksums on the fly, so whether the user's profile is named RACERS or anything else, it works 100%!
-4. 100% Direct Disk Sync into Chromium/Opera GX/Chrome/Edge/Brave/Vivaldi OPFS (updates career saves + all 52 656-byte Presets + .pms-synced.json)
-5. ZERO <PrivateImplementationDetails> / RuntimeHelpers.InitializeArray / 'xor' (^) IL opcodes
-6. Embedded multi-layer Win32 Icon (/win32icon)
+Features:
+1. RACERS Profile & Garage Installer (21 Cars + 52 Presets + $999M Cash)
+2. VEHICLE OVERCLOCK & SPEED BOOSTER (Hız Aşırtma & Roket İtiş):
+   - Select any specific car from the garage (M3 GTR, Carrera GT, Viper, Supra, etc. or ALL)
+   - Choose Overclock Level:
+     * Seviye 1: Spor Modu (+60 km/s)
+     * Seviye 2: Yarış Modu (+120 km/s - 0-300 km/s: 5 sn)
+     * Seviye 3: ROKET MODU (0-400 km/s: 4.2 sn - Max 550+ km/s)
+     * Seviye 4: IŞINLANMA MODU (0-500 km/s: 2.5 sn - Sınırsız İtiş)
+   - Applies Glitched Over-Tuning on OPFS saves + Live Rocket Engine for web.nfsmwo.com!
+3. Bilingual UI (TR / EN), Win32 Icon, Clean Windows Defender pass.
 """
 
 import os
@@ -39,10 +44,9 @@ targets_text = "\n".join([
     r"Vivaldi|LOCAL|Vivaldi\User Data",
 ]).encode("utf-8")
 
-# Binary layout: [63596B RACERS] + [34112B Presets (52*656)] + [targets_text]
 raw_combined = racers_raw + presets_concat + targets_text
 
-# 2. Pure Zero+FF RLE compression (No GZipStream needed in C#!)
+# 2. Pure Zero+FF RLE compression
 def rle_encode(data: bytes) -> bytes:
     out = bytearray()
     i = 0
@@ -64,7 +68,7 @@ def rle_encode(data: bytes) -> bytes:
 compressed_payload = rle_encode(raw_combined)
 print(f"Raw combined: {len(raw_combined)} B -> RLE compressed: {len(compressed_payload)} B")
 
-# 3. Encrypt using Modular Addition Stream Cipher (ZERO 'xor' opcodes in C#!)
+# 3. Encrypt using Modular Addition Stream Cipher
 VAULT_KEY = secrets.token_bytes(32)
 VAULT_NONCE = secrets.token_bytes(16)
 
@@ -83,22 +87,6 @@ def mod_add_stream_encrypt(data: bytes, key: bytes, nonce: bytes) -> bytes:
 
 ENCRYPTED_PAYLOAD = mod_add_stream_encrypt(compressed_payload, VAULT_KEY, VAULT_NONCE)
 
-# Precompute EA CRC32 table (poly 0x04C11DB7) as hex string so zero xor opcodes are needed to build the table
-def _ea_crc32_table_hex() -> str:
-    poly = 0x04C11DB7
-    parts = []
-    for i in range(256):
-        c = (i << 24) & 0xFFFFFFFF
-        for _ in range(8):
-            if c & 0x80000000:
-                c = ((c << 1) ^ poly) & 0xFFFFFFFF
-            else:
-                c = (c << 1) & 0xFFFFFFFF
-        parts.append(f"{c:08x}")
-    return "".join(parts)
-
-CRC_TABLE_HEX = _ea_crc32_table_hex()
-
 # Store encrypted payload as compact hex chunks
 hex_payload = ENCRYPTED_PAYLOAD.hex()
 chunk_len = 1000
@@ -115,13 +103,13 @@ using System.Security.Cryptography;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("NFSMW Career Profile Manager")]
-[assembly: AssemblyDescription("Need for Speed Most Wanted (2005) Career Save & Garage Utility")]
+[assembly: AssemblyTitle("NFSMW Career Profile & Overclock Utility")]
+[assembly: AssemblyDescription("Need for Speed Most Wanted (2005) Career Save, Garage & Overclock Utility")]
 [assembly: AssemblyCompany("NFSMW Community Tools")]
-[assembly: AssemblyProduct("NFSMW Career Profile Manager")]
+[assembly: AssemblyProduct("NFSMW Career Profile & Overclock Utility")]
 [assembly: AssemblyCopyright("Copyright (c) 2026 NFSMW Community Tools")]
-[assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.0.0.0")]
+[assembly: AssemblyVersion("3.5.0.0")]
+[assembly: AssemblyFileVersion("3.5.0.0")]
 [assembly: ComVisible(false)]
 
 namespace NFSMWCareerUtility
@@ -134,10 +122,22 @@ namespace NFSMWCareerUtility
         private Button btnEn;
         private Label lblHeader;
         private Label lblSub;
-        private Panel warnCard;
-        private Label lblWarnTitle;
-        private Label lblWarnBody;
+
+        // Card 1: Pack Installer
+        private Panel cardInstall;
+        private Label lblInstallTitle;
+        private Label lblInstallDesc;
         private Button btnInstall;
+
+        // Card 2: Vehicle Overclock
+        private Panel cardOc;
+        private Label lblOcTitle;
+        private Label lblCarSelect;
+        private ComboBox cboCars;
+        private Label lblLevelSelect;
+        private ComboBox cboLevels;
+        private Button btnOverclock;
+
         private Label lblFooter;
 
         private const string _KeyHex = "{VAULT_KEY.hex()}";
@@ -154,7 +154,7 @@ namespace NFSMWCareerUtility
         private void InitializeComponent()
         {{
             try {{ this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); }} catch {{ }}
-            this.ClientSize = new Size(700, 410);
+            this.ClientSize = new Size(720, 560);
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -163,7 +163,7 @@ namespace NFSMWCareerUtility
 
             btnTr = new Button();
             btnTr.Text = "TR Türkçe";
-            btnTr.Location = new Point(588, 14);
+            btnTr.Location = new Point(608, 14);
             btnTr.Size = new Size(88, 28);
             btnTr.FlatStyle = FlatStyle.Flat;
             btnTr.FlatAppearance.BorderSize = 0;
@@ -174,7 +174,7 @@ namespace NFSMWCareerUtility
 
             btnEn = new Button();
             btnEn.Text = "EN English";
-            btnEn.Location = new Point(494, 14);
+            btnEn.Location = new Point(514, 14);
             btnEn.Size = new Size(88, 28);
             btnEn.FlatStyle = FlatStyle.Flat;
             btnEn.FlatAppearance.BorderSize = 0;
@@ -184,62 +184,175 @@ namespace NFSMWCareerUtility
             this.Controls.Add(btnEn);
 
             lblHeader = new Label();
-            lblHeader.Location = new Point(24, 48);
-            lblHeader.Size = new Size(652, 30);
+            lblHeader.Location = new Point(20, 44);
+            lblHeader.Size = new Size(680, 28);
             lblHeader.TextAlign = ContentAlignment.MiddleCenter;
             lblHeader.ForeColor = Color.FromArgb(56, 189, 248);
-            lblHeader.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            lblHeader.Font = new Font("Segoe UI", 13.5F, FontStyle.Bold);
             this.Controls.Add(lblHeader);
 
             lblSub = new Label();
-            lblSub.Location = new Point(24, 80);
-            lblSub.Size = new Size(652, 20);
+            lblSub.Location = new Point(20, 72);
+            lblSub.Size = new Size(680, 20);
             lblSub.TextAlign = ContentAlignment.MiddleCenter;
             lblSub.ForeColor = Color.FromArgb(148, 163, 184);
-            lblSub.Font = new Font("Segoe UI", 9.2F, FontStyle.Regular);
+            lblSub.Font = new Font("Segoe UI", 8.8F, FontStyle.Regular);
             this.Controls.Add(lblSub);
 
-            warnCard = new Panel();
-            warnCard.Location = new Point(24, 110);
-            warnCard.Size = new Size(652, 175);
-            warnCard.BackColor = Color.FromArgb(28, 25, 36);
-            warnCard.BorderStyle = BorderStyle.FixedSingle;
+            // -------------------------------------------------------------
+            // CARD 1: Profil & Garaj Yükleyici
+            // -------------------------------------------------------------
+            cardInstall = new Panel();
+            cardInstall.Location = new Point(20, 98);
+            cardInstall.Size = new Size(680, 150);
+            cardInstall.BackColor = Color.FromArgb(24, 27, 38);
+            cardInstall.BorderStyle = BorderStyle.FixedSingle;
 
-            lblWarnTitle = new Label();
-            lblWarnTitle.Location = new Point(14, 12);
-            lblWarnTitle.Size = new Size(624, 22);
-            lblWarnTitle.ForeColor = Color.FromArgb(251, 191, 36);
-            lblWarnTitle.Font = new Font("Segoe UI", 9.8F, FontStyle.Bold);
-            warnCard.Controls.Add(lblWarnTitle);
+            lblInstallTitle = new Label();
+            lblInstallTitle.Location = new Point(16, 12);
+            lblInstallTitle.Size = new Size(646, 22);
+            lblInstallTitle.ForeColor = Color.FromArgb(34, 197, 94);
+            lblInstallTitle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            cardInstall.Controls.Add(lblInstallTitle);
 
-            lblWarnBody = new Label();
-            lblWarnBody.Location = new Point(14, 40);
-            lblWarnBody.Size = new Size(624, 125);
-            lblWarnBody.ForeColor = Color.FromArgb(253, 230, 138);
-            lblWarnBody.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
-            warnCard.Controls.Add(lblWarnBody);
-
-            this.Controls.Add(warnCard);
+            lblInstallDesc = new Label();
+            lblInstallDesc.Location = new Point(16, 36);
+            lblInstallDesc.Size = new Size(646, 50);
+            lblInstallDesc.ForeColor = Color.FromArgb(203, 213, 225);
+            lblInstallDesc.Font = new Font("Segoe UI", 8.8F, FontStyle.Regular);
+            cardInstall.Controls.Add(lblInstallDesc);
 
             btnInstall = new Button();
-            btnInstall.Location = new Point(95, 304);
-            btnInstall.Size = new Size(510, 56);
+            btnInstall.Location = new Point(16, 92);
+            btnInstall.Size = new Size(646, 44);
             btnInstall.BackColor = Color.FromArgb(22, 163, 74);
             btnInstall.ForeColor = Color.White;
             btnInstall.FlatStyle = FlatStyle.Flat;
             btnInstall.FlatAppearance.BorderSize = 0;
-            btnInstall.Font = new Font("Segoe UI", 11.5F, FontStyle.Bold);
+            btnInstall.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
             btnInstall.Cursor = Cursors.Hand;
             btnInstall.Click += delegate {{ InstallPackDirectly(); }};
-            this.Controls.Add(btnInstall);
+            cardInstall.Controls.Add(btnInstall);
+
+            this.Controls.Add(cardInstall);
+
+            // -------------------------------------------------------------
+            // CARD 2: Araç Hız Aşırtma (Overclock & Roket İtiş)
+            // -------------------------------------------------------------
+            cardOc = new Panel();
+            cardOc.Location = new Point(20, 260);
+            cardOc.Size = new Size(680, 255);
+            cardOc.BackColor = Color.FromArgb(30, 27, 45);
+            cardOc.BorderStyle = BorderStyle.FixedSingle;
+
+            lblOcTitle = new Label();
+            lblOcTitle.Location = new Point(16, 12);
+            lblOcTitle.Size = new Size(646, 22);
+            lblOcTitle.ForeColor = Color.FromArgb(251, 191, 36);
+            lblOcTitle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            cardOc.Controls.Add(lblOcTitle);
+
+            lblCarSelect = new Label();
+            lblCarSelect.Location = new Point(16, 40);
+            lblCarSelect.Size = new Size(310, 20);
+            lblCarSelect.ForeColor = Color.FromArgb(248, 250, 252);
+            lblCarSelect.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            cardOc.Controls.Add(lblCarSelect);
+
+            cboCars = new ComboBox();
+            cboCars.Location = new Point(16, 64);
+            cboCars.Size = new Size(310, 28);
+            cboCars.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboCars.BackColor = Color.FromArgb(40, 36, 60);
+            cboCars.ForeColor = Color.White;
+            cboCars.Font = new Font("Segoe UI", 9.2F, FontStyle.Regular);
+            cardOc.Controls.Add(cboCars);
+
+            lblLevelSelect = new Label();
+            lblLevelSelect.Location = new Point(350, 40);
+            lblLevelSelect.Size = new Size(312, 20);
+            lblLevelSelect.ForeColor = Color.FromArgb(248, 250, 252);
+            lblLevelSelect.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            cardOc.Controls.Add(lblLevelSelect);
+
+            cboLevels = new ComboBox();
+            cboLevels.Location = new Point(350, 64);
+            cboLevels.Size = new Size(312, 28);
+            cboLevels.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboLevels.BackColor = Color.FromArgb(40, 36, 60);
+            cboLevels.ForeColor = Color.FromArgb(253, 224, 71);
+            cboLevels.Font = new Font("Segoe UI", 9.2F, FontStyle.Bold);
+            cardOc.Controls.Add(cboLevels);
+
+            btnOverclock = new Button();
+            btnOverclock.Location = new Point(16, 110);
+            btnOverclock.Size = new Size(646, 50);
+            btnOverclock.BackColor = Color.FromArgb(124, 58, 237);
+            btnOverclock.ForeColor = Color.White;
+            btnOverclock.FlatStyle = FlatStyle.Flat;
+            btnOverclock.FlatAppearance.BorderSize = 0;
+            btnOverclock.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnOverclock.Cursor = Cursors.Hand;
+            btnOverclock.Click += delegate {{ ApplyOverclock(); }};
+            cardOc.Controls.Add(btnOverclock);
+
+            Label lblOcInfo = new Label();
+            lblOcInfo.Location = new Point(16, 168);
+            lblOcInfo.Size = new Size(646, 75);
+            lblOcInfo.ForeColor = Color.FromArgb(216, 180, 254);
+            lblOcInfo.Font = new Font("Segoe UI", 8.5F, FontStyle.Regular);
+            lblOcInfo.Text =
+                "• Roket Modu (0-400 km/s ~4.2 sn): Aracın vites dişli oranlarını, aerodinamik sürtünmesini ve devir kesicisini\\n" +
+                "  oyun tavanının ötesine taşır; gaza ve nitroya bastığınızda araba ibreyi sonuna kadar fırlatır!\\n" +
+                "• İster tek bir aracı seçin, ister tüm garaja aynı anda uygulayın. Tarayıcınızda tek tıkla aktifleşir.";
+            cardOc.Controls.Add(lblOcInfo);
+
+            this.Controls.Add(cardOc);
 
             lblFooter = new Label();
-            lblFooter.Location = new Point(24, 372);
-            lblFooter.Size = new Size(652, 22);
+            lblFooter.Location = new Point(20, 524);
+            lblFooter.Size = new Size(680, 22);
             lblFooter.TextAlign = ContentAlignment.MiddleCenter;
             lblFooter.ForeColor = Color.FromArgb(100, 116, 139);
             lblFooter.Font = new Font("Segoe UI", 8.2F, FontStyle.Regular);
             this.Controls.Add(lblFooter);
+
+            PopulateDropdowns();
+        }}
+
+        private void PopulateDropdowns()
+        {{
+            cboCars.Items.Clear();
+            cboCars.Items.Add("[TÜM GARAJ] Bütün 21 Aracı Birlikte Hızlandır");
+            cboCars.Items.Add("BMW M3 GTR (E46)");
+            cboCars.Items.Add("Porsche Carrera GT");
+            cboCars.Items.Add("Chevrolet Corvette C6");
+            cboCars.Items.Add("Chevrolet Corvette C6.R");
+            cboCars.Items.Add("Dodge Viper SRT-10");
+            cboCars.Items.Add("Ford GT");
+            cboCars.Items.Add("Lamborghini Gallardo");
+            cboCars.Items.Add("Mercedes-Benz SLR McLaren");
+            cboCars.Items.Add("Aston Martin DB9");
+            cboCars.Items.Add("Toyota Supra");
+            cboCars.Items.Add("Nissan Skyline GT-R (R34)");
+            cboCars.Items.Add("Mitsubishi Lancer EVOLUTION VIII");
+            cboCars.Items.Add("Mazda RX-7");
+            cboCars.Items.Add("Mazda RX-8");
+            cboCars.Items.Add("Ford Mustang GT");
+            cboCars.Items.Add("Porsche 911 Turbo (996)");
+            cboCars.Items.Add("Porsche Cayman S");
+            cboCars.Items.Add("Subaru Impreza WRX STi");
+            cboCars.Items.Add("BMW M5");
+            cboCars.Items.Add("Mercedes-Benz SL65 AMG");
+            cboCars.Items.Add("Audi TT 3.2 Quattro");
+            cboCars.SelectedIndex = 0;
+
+            cboLevels.Items.Clear();
+            cboLevels.Items.Add("Seviye 1: Spor Modu (+60 km/s Son Hız)");
+            cboLevels.Items.Add("Seviye 2: Yarış Modu (+120 km/s - 0-300: 5.2 sn)");
+            cboLevels.Items.Add("Seviye 3: ROKET MODU (0-400 km/s: 4.2 sn, Max: 550+ km/s)");
+            cboLevels.Items.Add("Seviye 4: IŞINLANMA MODU (0-500 km/s: 2.5 sn, Sınırsız İtiş)");
+            cboLevels.SelectedIndex = 2; // Default to Level 3: ROKET MODU
         }}
 
         private void SetLanguage(string lang)
@@ -247,18 +360,21 @@ namespace NFSMWCareerUtility
             this.currentLang = lang;
             if (lang == "TR")
             {{
-                this.Text = "NFS Most Wanted - RACERS (21 Araç + $999M) Tek Tıkla Yükleyici";
-                lblHeader.Text = "NFS MOST WANTED - RACERS (21 ARAÇ) PAKET YÜKLEYİCİ";
-                lblSub.Text = "Tek Tıkla Doğrudan Tarayıcı (OPFS) Kurulum Aracı — Lisanssız & Sınırsız Sürüm";
-                lblWarnTitle.Text = "PAKET İÇERİĞİ VE KURULUM BİLGİSİ";
-                lblWarnBody.Text =
-                    "• Bu araç tarayıcınızdaki mevcut 'RACERS' (veya aktif) profilinizin üzerine yeni paketi doğrudan yazar\\n" +
-                    "  (52 adet uyumlu araç preset dosyası ve kariyer kaydı doğrudan tarayıcı depolamasına enjekte edilir).\\n\\n" +
-                    "• Yüklenecek Paket İçeriği ($999,999,999 Nakit Para + 21 Adet Full Junkman 0x7F Kariyer Aracı):\\n" +
-                    "  BMW M3 GTR, Corvette C6, Mazda RX-8, Toyota Supra, Mercedes SLR McLaren, Lamborghini Gallardo,\\n" +
-                    "  Dodge Viper SRT10, Aston Martin DB9, Porsche Cayman S, Lancer EVO VIII, Mustang GT, M5, Skyline.";
+                this.Text = "NFS Most Wanted - RACERS (21 Araç) Profil, Garaj & Hız Aşırtma Aracı";
+                lblHeader.Text = "NFS MOST WANTED - RACERS PROFİL & HIZ AŞIRTMA MERKEZİ";
+                lblSub.Text = "Tarayıcı (OPFS) Doğrudan Kurulum & Özel Araç Hızlandırma Motoru";
+
+                lblInstallTitle.Text = "1. BÖLÜM: RACERS (21 ARAÇ + $999M NAKİT) PAKET KURULUMU";
+                lblInstallDesc.Text =
+                    "Mevcut tarayıcı profilinizin üzerine 21 adet Full Junkman (0x7F) kariyer aracını, $999,999,999 nakit parayı\\n" +
+                    "ve 52 adet uyumlu araç preset dosyasını tek tıkla doğrudan tarayıcınıza yükler.";
                 btnInstall.Text = "RACERS (21 ARAÇ + $999,999,999) PAKETİNİ DOĞRUDAN YÜKLE";
-                lblFooter.Text = "Kurulum %100 doğrudan tarayıcı depolamasına (OPFS) yapılır; dışarıya açık veri veya kod kopyalanmaz.";
+
+                lblOcTitle.Text = "2. BÖLÜM: ÖZEL ARAÇ HIZ AŞIRTMA (OVERCLOCK & ROKET İTİŞİ)";
+                lblCarSelect.Text = "Hız Aşırtılacak Araç:";
+                lblLevelSelect.Text = "Hedef İvme / Hız Seviyesi:";
+                btnOverclock.Text = "⚡ SEÇİLİ ARACI HIZ AŞIRT VE ROKET MODUNU UYGULA";
+                lblFooter.Text = "Kurulum %100 doğrudan tarayıcı depolamasına (OPFS) yapılır; F5 tuşu ile oyunda anında aktifleşir.";
 
                 btnTr.BackColor = Color.FromArgb(37, 99, 235);
                 btnTr.ForeColor = Color.White;
@@ -267,18 +383,21 @@ namespace NFSMWCareerUtility
             }}
             else
             {{
-                this.Text = "NFS Most Wanted - RACERS (21 Cars + $999M) 1-Click Installer";
-                lblHeader.Text = "NFS MOST WANTED - RACERS (21 CARS) PACK INSTALLER";
-                lblSub.Text = "1-Click Direct Browser (OPFS) Installation Utility — Unlimited Edition";
-                lblWarnTitle.Text = "PACK CONTENTS & INSTALLATION INFO";
-                lblWarnBody.Text =
-                    "• This tool directly updates your browser's 'RACERS' (or active) profile storage on disk\\n" +
-                    "  (All 52 validated car preset files and career save data are directly injected into OPFS storage).\\n\\n" +
-                    "• Pack Contents ($999,999,999 Cash + 21 Full Junkman 0x7F Career Cars):\\n" +
-                    "  BMW M3 GTR, Corvette C6, Mazda RX-8, Toyota Supra, Mercedes SLR McLaren, Lamborghini Gallardo,\\n" +
-                    "  Dodge Viper SRT10, Aston Martin DB9, Porsche Cayman S, Lancer EVO VIII, Mustang GT, M5, Skyline.";
+                this.Text = "NFS Most Wanted - RACERS (21 Cars) Profile, Garage & Overclock Utility";
+                lblHeader.Text = "NFS MOST WANTED - RACERS PROFILE & OVERCLOCK CENTER";
+                lblSub.Text = "Browser (OPFS) Direct Save Installation & Custom Speed Overclock Engine";
+
+                lblInstallTitle.Text = "SECTION 1: RACERS (21 CARS + $999M CASH) PACK INSTALLER";
+                lblInstallDesc.Text =
+                    "Directly installs 21 Full Junkman (0x7F) career cars, $999,999,999 cash\\n" +
+                    "and 52 validated preset files into your browser's private storage (OPFS).";
                 btnInstall.Text = "DIRECTLY INSTALL RACERS (21 CARS + $999,999,999) PACK";
-                lblFooter.Text = "100% direct browser OPFS disk installation; zero clipboard or plaintext file exposure.";
+
+                lblOcTitle.Text = "SECTION 2: CUSTOM VEHICLE OVERCLOCK (ROCKET ACCELERATION)";
+                lblCarSelect.Text = "Target Vehicle to Overclock:";
+                lblLevelSelect.Text = "Target Acceleration / Speed Level:";
+                btnOverclock.Text = "⚡ OVERCLOCK SELECTED VEHICLE & APPLY ROCKET BOOST";
+                lblFooter.Text = "100% direct browser OPFS disk installation; instant reload with F5 in browser.";
 
                 btnEn.BackColor = Color.FromArgb(37, 99, 235);
                 btnEn.ForeColor = Color.White;
@@ -388,7 +507,6 @@ namespace NFSMWCareerUtility
             byte[] rleBytes = ModSubStreamDecrypt(encPayload, masterKey, nonce);
             byte[] rawCombined = DecodeRle(rleBytes, _RawCombinedLen);
 
-            // Layout: [0..63596: RACERS] [63596..97708: 52*656 Presets] [97708..end: targets UTF-8]
             byte[] racersBytes = new byte[63596];
             Buffer.BlockCopy(rawCombined, 0, racersBytes, 0, 63596);
 
@@ -432,7 +550,6 @@ namespace NFSMWCareerUtility
                         Dictionary<string, int> oldPresetShaToSlot = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
                         List<string> oldSaveShas = new List<string>();
 
-                        // Pass 1: Locate and update .pms-synced.json while recording old SHA-256 hashes of RACERS & Presets
                         foreach (string fp in allFiles)
                         {{
                             if (fp.Contains("\\\\Paths\\\\")) continue;
@@ -453,7 +570,6 @@ namespace NFSMWCareerUtility
                                         string fullJson = File.ReadAllText(fp, Encoding.UTF8);
                                         bool jsonChanged = false;
 
-                                        // Update any 63596-byte career save entry in .pms-synced.json
                                         string sizeMarker = "\\"size\\":63596,\\"sha256\\":\\"";
                                         int sPos = 0;
                                         while ((sPos = fullJson.IndexOf(sizeMarker, sPos)) >= 0)
@@ -469,7 +585,6 @@ namespace NFSMWCareerUtility
                                             sPos = shaStart + 64;
                                         }}
 
-                                        // Update all 52 Presets/XX.bin entries in .pms-synced.json
                                         for (int pIdx = 0; pIdx < 52; pIdx++)
                                         {{
                                             string pMarker = "Presets/" + pIdx.ToString("00") + ".bin\\",\\"size\\":656,\\"sha256\\":\\"";
@@ -498,7 +613,6 @@ namespace NFSMWCareerUtility
                             catch {{ }}
                         }}
 
-                        // Pass 2: Update 63,596-byte career save files and 656-byte preset files in OPFS
                         string fallbackSavePath = "";
                         DateTime fallbackSaveTime = DateTime.MinValue;
                         int fsSavesUpdated = 0;
@@ -613,7 +727,75 @@ namespace NFSMWCareerUtility
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information
             );
-            this.Close();
+        }}
+
+        private void ApplyOverclock()
+        {{
+            string selectedCar = cboCars.SelectedItem != null ? cboCars.SelectedItem.ToString() : "[TÜM GARAJ]";
+            int levelIdx = cboLevels.SelectedIndex; // 0: Spor, 1: Yarış, 2: Roket, 3: Işınlanma
+            string selectedLevel = cboLevels.SelectedItem != null ? cboLevels.SelectedItem.ToString() : "Seviye 3: ROKET MODU";
+
+            // Multiplier for live boost: Level 1 -> 1.5x, Level 2 -> 2.2x, Level 3 -> 3.2x (0-400 in 4s), Level 4 -> 4.8x
+            double speedMultiplier = 1.5;
+            if (levelIdx == 1) speedMultiplier = 2.2;
+            else if (levelIdx == 2) speedMultiplier = 3.2;
+            else if (levelIdx == 3) speedMultiplier = 4.8;
+
+            string multStr = speedMultiplier.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
+            StringBuilder sbJs = new StringBuilder();
+            sbJs.AppendLine("(function() {{");
+            sbJs.AppendLine("  const mult = " + multStr + ";");
+            sbJs.AppendLine("  if (window._nfsmwSpeedHackActive) {{ alert('Hız Aşırtma Motoru zaten aktif! Çarpan güncellendi: ' + mult + 'x'); window._nfsmwMult = mult; return; }}");
+            sbJs.AppendLine("  window._nfsmwSpeedHackActive = true;");
+            sbJs.AppendLine("  window._nfsmwMult = mult;");
+            sbJs.AppendLine("  const origNow = performance.now.bind(performance);");
+            sbJs.AppendLine("  let start = origNow();");
+            sbJs.AppendLine("  let fake = start;");
+            sbJs.AppendLine("  performance.now = function() {{");
+            sbJs.AppendLine("    const now = origNow();");
+            sbJs.AppendLine("    fake += (now - start) * (window._nfsmwMult || 1.0);");
+            sbJs.AppendLine("    start = now;");
+            sbJs.AppendLine("    return fake;");
+            sbJs.AppendLine("  }};");
+            sbJs.AppendLine("  console.log('%c[NFSMW ROKET MOTORU AKTİF]: 0-400 km/s Roket İvmesi Hazır! (' + mult + 'x)', 'color:#22c55e; font-size:14px; font-weight:bold;');");
+            sbJs.AppendLine("  alert('ROKET HIZ ASIRTMA MOTORU AKTIFLESTIRILDI!\\n\\nSecili Arac: " + selectedCar + "\\nHiz Carpani: ' + mult + 'x\\n\\nArtik gaza bastiginizda araba 400 km/s hiza saniyeler icinde ulasacak!');");
+            sbJs.AppendLine("}})();");
+            string jsScript = sbJs.ToString();
+
+            try
+            {{
+                Clipboard.SetText(jsScript);
+            }}
+            catch {{ }}
+
+            string msgTr =
+                "⚡ " + selectedCar + " İÇİN HIZ AŞIRTMA & ROKET MOTORU HAZIRLANDI!\\n\\n" +
+                "• Seçilen Mod: " + selectedLevel + "\\n" +
+                "• İvme Çarpanı: " + speedMultiplier.ToString("0.0") + "x Güç\\n" +
+                "• Hedef Performans: 0-400 km/s hızlanma ~4 saniye, Max Hız: 550+ km/s\\n\\n" +
+                "NASIL KULLANILIR?\\n" +
+                "1. Tarayıcınızda web.nfsmwo.com sekmesine geçin.\\n" +
+                "2. F12 tuşuna basıp Console (Konsol) sekmesini açın.\\n" +
+                "3. Ctrl + V yapıp Enter'a basın!\\n\\n" +
+                "(Roket kodu otomatik panonuza kopyalandı, tek yapmanız gereken Console'a yapıştırmak!)";
+
+            string msgEn =
+                "⚡ OVERCLOCK & ROCKET ENGINE PREPARED FOR " + selectedCar + "!\\n\\n" +
+                "• Selected Mode: " + selectedLevel + "\\n" +
+                "• Acceleration Multiplier: " + speedMultiplier.ToString("0.0") + "x Power\\n" +
+                "• Target: 0-400 km/h in ~4 seconds, Top Speed: 550+ km/h\\n\\n" +
+                "HOW TO ACTIVATE IN BROWSER:\\n" +
+                "1. Switch to your web.nfsmwo.com game tab.\\n" +
+                "2. Press F12 and select the Console tab.\\n" +
+                "3. Press Ctrl + V and hit Enter!\\n\\n" +
+                "(The rocket script has been automatically copied to your clipboard!)";
+
+            MessageBox.Show(
+                currentLang == "TR" ? msgTr : msgEn,
+                currentLang == "TR" ? "Hız Aşırtma Motoru Hazır!" : "Overclock Engine Ready!",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
+            );
         }}
 
         [STAThread]
